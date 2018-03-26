@@ -59,6 +59,7 @@ let rec exportNodeTree (node: SyntaxNode) =
   { Type = name
     TypeClass = if node.IsList then "list" else if node.IsToken then "token" else "syntax"
     Text = text
+    Collapsed = false
     Span = { Start = node.FullSpan.Start; End = node.FullSpan.End }
     Children = List.ofSeq (Seq.map exportNodeTree node.ChildNodes) }
 

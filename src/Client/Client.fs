@@ -26,7 +26,14 @@ type Model =
 type Msg =
 | ParseXml of string
 | ChangeCurrentSpan of Span
+| ToggleNode of XmlNode
 | ParsedXml of Result<XmlResult, exn>
+
+let rec toggleXmlNode (node: XmlNode) (root: XmlNode) =
+  if root = node then
+    { root with Collapsed = not root.Collapsed }
+  else
+    { root with Children = List.map (toggleXmlNode node) root.Children }
 
 let init () = 
   let model = 
@@ -46,6 +53,8 @@ let update msg (model : Model) =
       { model with Xml = xml }
     | ChangeCurrentSpan span ->
       { model with HighlightedSpan = Some span }
+    | ToggleNode xmlNode ->
+      { model with ParsedTree = Option.bind (fun root -> Some (toggleXmlNode xmlNode root)) model.ParsedTree }
     | _ -> model
   let postXml xml _ =
     postRecord "/api/parseXml" { XmlToParse = xml } []
@@ -73,18 +82,21 @@ let createTreeViewLabel xmlNode =
     span [Class "node-span"] [str (sprintf "[%i..%i)" xmlNode.Span.Start xmlNode.Span.End)]
   ]
 
-let rec createTreeViewNode xmlNode changeSpanCallback =
+let rec createTreeViewNode xmlNode changeSpanCallback toggleNodeCallback =
   let childNodes =
     if xmlNode.Children.Length > 0 then
-      [ul [Class "menu-list"] [ for child in xmlNode.Children do yield (createTreeViewNode child changeSpanCallback) ]]
+      [ul
+        [Class "menu-list"; Style [Display (if xmlNode.Collapsed then "none" else "block")]]
+        [ for child in xmlNode.Children do yield (createTreeViewNode child changeSpanCallback toggleNodeCallback) ]]
     else
       []
   li []
-    ([ a [OnMouseEnter (fun _ -> changeSpanCallback xmlNode)] (createTreeViewLabel xmlNode) ] @ childNodes)
+    ([ a [ OnMouseEnter (fun _ -> changeSpanCallback xmlNode)
+           OnClick (fun _ -> toggleNodeCallback xmlNode)]  (createTreeViewLabel xmlNode)] @ childNodes)
 
-let createTreeView model changeSpanCallback =
+let createTreeView model changeSpanCallback toggleNodeCallback =
   match model.ParsedTree with
-  | Some rootNode -> [ul [Class "menu-list"] [ createTreeViewNode rootNode changeSpanCallback ]]
+  | Some rootNode -> [ul [Class "menu-list"] [ createTreeViewNode rootNode changeSpanCallback toggleNodeCallback ]]
   | None -> [str "XML Tree"]
 
 let createTextArea model changeXmlCallback =
@@ -160,11 +172,12 @@ let createClassificationWindow model =
 let view model dispatch =
   let changeXmlCallback xml = dispatch (ParseXml xml)
   let changeSpanCallback node = dispatch (ChangeCurrentSpan node.Span)
+  let toggleNodeCallback node = dispatch (ToggleNode node)
   Tile.ancestor [Tile.Props [Style [ Height "100%"; Width "100%" ] ] ]
     [ Tile.parent [Tile.Size Tile.Is7]
         [ Tile.child [Tile.CustomClass "editor"] (createTextArea model changeXmlCallback)]
       Tile.parent [Tile.IsVertical]
-        [ Tile.child [Tile.CustomClass "xml-tree"] (createTreeView model changeSpanCallback) 
+        [ Tile.child [Tile.CustomClass "xml-tree"] (createTreeView model changeSpanCallback toggleNodeCallback)
           Tile.child [Tile.CustomClass "classification"] (createClassificationWindow model)
         ]
     ]

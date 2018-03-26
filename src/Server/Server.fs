@@ -99,6 +99,7 @@ let configureServices (services : IServiceCollection) =
 
 WebHost
   .CreateDefaultBuilder()
+  .UseKestrel(fun options -> options.Limits.MaxRequestBodySize <- new System.Nullable<int64> (15_000L))
   .UseWebRoot(clientPath)
   .UseContentRoot(clientPath)
   .Configure(Action<IApplicationBuilder> configureApp)

@@ -1,0 +1,85 @@
+
+#elmish-app {
+    height: 100vh;
+    padding: 2em;
+}
+
+div.tile {
+    min-height: 0;
+}
+
+.menu-list li ul {
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.classification {
+    overflow-y: auto;
+    padding: 1em;
+    flex-grow: .5;
+}
+
+.classification, .classification pre {
+    background-color: #3f3f3f;
+    color: #cfcfcf;
+}
+
+.classification pre {
+    padding: 0;
+}
+
+.classification .XmlName {
+    color: #81bb05;
+}
+
+.classification .XmlAttributeName {
+    color: #92caf4;
+}
+
+.classification .XmlAttributeQuotes {
+    color: #808080;
+}
+
+.classification .XmlAttributeValue {
+    color: #569cd6;
+}
+
+.editor textarea {
+    height: 100%;
+    width: 99%
+}
+
+.xml-tree {
+    overflow-y: auto;
+}
+
+.xml-tree .node-type {
+    display: inline-block;
+    font-weight: bold;
+}
+
+.xml-tree .token {
+    color: #81bb05;
+}
+
+.xml-tree .syntax {
+    color: #f35225;
+}
+
+.xml-tree .list {
+    color: #04a5f0
+}
+
+.xml-tree .node-text {
+    display: inline-block;
+    margin-left: .5em;
+    background-color: #e7e7e7;
+    font-size: smaller
+}
+
+.xml-tree .node-span {
+    display: inline-block;
+    margin-left: .5em;
+    color: #555555;
+    font-size: smaller
+}

@@ -3,6 +3,15 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+.fake/
+obj/
+bin/
+packages/
+paket-files/
+node_modules/
+src/Client/public/
+deploy/
+
 # User-specific files
 *.suo
 *.user

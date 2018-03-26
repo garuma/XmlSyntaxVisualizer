@@ -1,0 +1,9 @@
+group Server
+  FSharp.Core
+  Giraffe
+  Microsoft.AspNetCore
+  Microsoft.AspNetCore.StaticFiles
+  Microsoft.DotNet.Watcher.Tools
+  GuiLabs.Language.Xml
+  Fable.JsonConverter
+

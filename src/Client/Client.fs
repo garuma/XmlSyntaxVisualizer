@@ -151,7 +151,7 @@ let addHighlight (classifiedXml: (string * TextTag) list) (span: Span) =
   (*printfn "%A :: %A :: %A" before middle tail*)
   match middle with
     | None -> classifiedXml
-    | Some inner -> before @ [(String.Empty, Mark inner)] @ tail
+    | Some inner -> before @ ((String.Empty, Mark inner) :: tail)
 
 
 let rec reduceClassifiedList classifiedXml =

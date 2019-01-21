@@ -16,8 +16,10 @@ open Newtonsoft.Json
 open Shared
 open Microsoft.Language.Xml
 
-let clientPath = Path.Combine("..","Client") |> Path.GetFullPath
-let port = 8085us
+let tryGetEnv = System.Environment.GetEnvironmentVariable >> function null | "" -> None | x -> Some x
+
+let publicPath = Path.GetFullPath "../Client/public"
+let port = "SERVER_PORT" |> tryGetEnv |> Option.map uint16 |> Option.defaultValue 8085us
 
 let shouldClassify = function
   | XmlClassificationTypes.XmlName
@@ -85,23 +87,20 @@ let webApp : HttpHandler =
   ]
 
 let configureApp  (app : IApplicationBuilder) =
-  app.UseStaticFiles()
+  app.UseDefaultFiles()
+     .UseStaticFiles()
      .UseGiraffe webApp
 
 let configureServices (services : IServiceCollection) =
     services.AddGiraffe() |> ignore
-    // Configure JsonSerializer to use Fable.JsonConverter
-    let fableJsonSettings = JsonSerializerSettings()
-    fableJsonSettings.Converters.Add(Fable.JsonConverter())
-
-    services.AddSingleton<IJsonSerializer>(
-        NewtonsoftJsonSerializer(fableJsonSettings)) |> ignore
+    services.AddSingleton<Giraffe.Serialization.Json.IJsonSerializer>(Thoth.Json.Giraffe.ThothSerializer()) |> ignore
+    tryGetEnv "APPINSIGHTS_INSTRUMENTATIONKEY" |> Option.iter (services.AddApplicationInsightsTelemetry >> ignore)
 
 WebHost
   .CreateDefaultBuilder()
   .UseKestrel(fun options -> options.Limits.MaxRequestBodySize <- new System.Nullable<int64> (15_000L))
-  .UseWebRoot(clientPath)
-  .UseContentRoot(clientPath)
+  .UseWebRoot(publicPath)
+  .UseContentRoot(publicPath)
   .Configure(Action<IApplicationBuilder> configureApp)
   .ConfigureServices(configureServices)
   .UseUrls("http://0.0.0.0:" + port.ToString() + "/")

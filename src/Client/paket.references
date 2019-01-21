@@ -4,5 +4,5 @@ group Client
   Fable.Elmish.React
   Fable.Elmish.HMR
   Fable.Core
-  dotnet-fable
   Fulma
+  Thoth.Json

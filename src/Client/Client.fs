@@ -13,8 +13,8 @@ open Fable.PowerPack
 
 open Shared
 
-open Fulma.Layouts
-open Fulma.Elements
+open Fulma
+open Thoth.Json
 
 type Model =
   { Xml: string
@@ -27,7 +27,7 @@ type Msg =
 | ParseXml of string
 | ChangeCurrentSpan of Span
 | ToggleNode of XmlNode
-| ParsedXml of Result<XmlResult, exn>
+| ParsedXml of Result<Result<XmlResult, string>, exn>
 
 let rec toggleXmlNode (node: XmlNode) (root: XmlNode) =
   if root = node then
@@ -43,10 +43,12 @@ let init () =
       HighlightedSpan = None }
   model, (Cmd.ofMsg (ParseXml Shared.InitialXml))
 
+let xmlResultDecoder = Decode.Auto.generateDecoder<XmlResult>()
+
 let update msg (model : Model) =
   let model' =
     match msg with
-    | ParsedXml (Ok { ParsedTree = newNode; ClassifiedXml = classifiedXml }) ->
+    | ParsedXml (Ok (Ok { ParsedTree = newNode; ClassifiedXml = classifiedXml })) ->
       { model with ParsedTree = newNode
                    ClassifiedXml = classifiedXml }
     | ParseXml xml ->
@@ -59,7 +61,7 @@ let update msg (model : Model) =
   let postXml xml _ =
     postRecord "/api/parseXml" { XmlToParse = xml } []
     |> Promise.bind (fun fetched -> fetched.text())
-    |> Promise.map ofJson<XmlResult>
+    |> Promise.map (Decode.fromString xmlResultDecoder)
   let cmd' =
     match msg with
     | ParseXml xml ->

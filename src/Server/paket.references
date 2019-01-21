@@ -3,7 +3,8 @@ group Server
   Giraffe
   Microsoft.AspNetCore
   Microsoft.AspNetCore.StaticFiles
-  Microsoft.DotNet.Watcher.Tools
   GuiLabs.Language.Xml
-  Fable.JsonConverter
+  Thoth.Json.Giraffe
+  Microsoft.ApplicationInsights.AspNetCore
+  WindowsAzure.Storage
 

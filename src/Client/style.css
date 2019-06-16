@@ -1,7 +1,7 @@
 
 #elmish-app {
     height: 100vh;
-    padding: 2em;
+    padding: 1em;
 }
 
 div.tile {
@@ -63,7 +63,7 @@ div.tile {
 }
 
 .xml-tree .syntax {
-    color: #f35225;
+    color: #b925f3;
 }
 
 .xml-tree .list {
@@ -82,4 +82,13 @@ div.tile {
     margin-left: .5em;
     color: #555555;
     font-size: smaller
+}
+
+.xml-tree a.has-error::before {
+    content: "🛑 ";
+}
+
+.xml-tree p.error {
+    color: rgb(206, 9, 9);
+    margin-left: 1em;
 }

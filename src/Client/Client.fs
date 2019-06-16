@@ -92,9 +92,15 @@ let rec createTreeViewNode xmlNode changeSpanCallback toggleNodeCallback =
         [ for child in xmlNode.Children do yield (createTreeViewNode child changeSpanCallback toggleNodeCallback) ]]
     else
       []
+  let errorNodes =
+    if xmlNode.Errors.Length > 0 then
+      [ for error in xmlNode.Errors do yield (p [Class "error"] [str (sprintf "%s: %s" error.Id.[4..] error.Description)]) ]
+    else
+      []
   li []
     ([ a [ OnMouseEnter (fun _ -> changeSpanCallback xmlNode)
-           OnClick (fun _ -> toggleNodeCallback xmlNode)]  (createTreeViewLabel xmlNode)] @ childNodes)
+           OnClick (fun _ -> toggleNodeCallback xmlNode)
+           (if (List.isEmpty xmlNode.Errors) then (Class "has-no-error") else (Class "has-error")) ] (createTreeViewLabel xmlNode)] @ errorNodes @ childNodes)
 
 let createTreeView model changeSpanCallback toggleNodeCallback =
   match model.ParsedTree with

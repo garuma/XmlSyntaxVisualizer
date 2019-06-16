@@ -6,6 +6,10 @@ type Span =
   { Start: int
     End: int }
 
+type XmlDiagnosticInfo =
+  { Id: string
+    Description: string }
+
 type TextTag =
   | Plain
   | Span of string
@@ -18,6 +22,7 @@ type XmlNode =
     Text: string option
     Span: Span
     Collapsed: bool
+    Errors: XmlDiagnosticInfo list
     Children: XmlNode list }
   override x.Equals(yObj) =
     match yObj with

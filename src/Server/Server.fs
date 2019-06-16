@@ -58,10 +58,15 @@ let createClassifiedHtml (node: SyntaxNode) =
 let rec exportNodeTree (node: SyntaxNode) =
   let name = if node.IsList then "SyntaxList" else node.GetType().Name
   let text = if node.IsToken then Some (node :?> SyntaxToken).Text else None
+  let errors =
+    if node.ContainsDiagnostics
+    then List.map (fun (d: DiagnosticInfo) -> { Id = (string d.ErrorID); Description = (d.GetDescription()) }) (Array.toList (node.GetDiagnostics()))
+    else List.empty
   { Type = name
     TypeClass = if node.IsList then "list" else if node.IsToken then "token" else "syntax"
     Text = text
     Collapsed = false
+    Errors = errors
     Span = { Start = node.FullSpan.Start; End = node.FullSpan.End }
     Children = List.ofSeq (Seq.map exportNodeTree node.ChildNodes) }
 
